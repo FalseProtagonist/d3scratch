@@ -6,4 +6,12 @@ nodes (clj->js
                 {:x width :y height}])
 
 
-
+           (.on "tick" (fn [] (do
+                                    (-> node 
+                                        .transition
+                                        (.ease "linear")
+                                        (.duration animationStep)
+                                        (.attr "x1" #(-> % .-source .-x)))
+                                    (.stop force)
+                                    (js/setTimeout #(.start force) animationStep)
+                                    )))
