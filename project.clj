@@ -17,7 +17,9 @@
                  [enlive "1.1.5"]
                  [om "0.8.0-rc1"]
                  [environ "1.0.0"]
-                 [sablono "0.2.22"]]
+                 [sablono "0.2.22"]
+                 [org.clojure/clojure "1.6.0"]
+                 ]
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-environ "1.0.0"]]
 
