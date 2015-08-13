@@ -1,4 +1,5 @@
 (ns chestnut.graph
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [sablono.core :as h :refer-macros [html]]
@@ -95,9 +96,18 @@
       {:graphstate "graphstate2"})      
     om/IRenderState
     (render-state [_ _]
-      (html
-       [:div#map
-        [:p (om/get-state owner :graphstate)]
-        [:p data]]))
+      (do (html
+           [:div#map
+            [:p (om/get-state owner :graphstate)]
+            [:p data]]))
+      )
+    om/IWillMount
+    (will-mount [_]
+      (let [channel (:refresh data)]
+        (go (loop []
+              (let [message (<! channel)]
+                (force-layout)
+                #_(js/alert message)
+                (recur))))))
     om/IDidMount
     (did-mount [this] (force-layout))))

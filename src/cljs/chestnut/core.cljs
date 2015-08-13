@@ -29,14 +29,14 @@
                       [:button (:text app)]
                       [:button (om/get-state owner :buttontext)]
                       [:button "rerun"] 
-                      [:p (om/build graph-component "passed" nil)]
+                      [:p (om/build graph-component mystate nil)]
                       [:p "world"]]]))
        om/IWillMount
        (will-mount [_]
-         (let [delete (om/get-state owner :refresh)]
+         (let [channel (om/get-state owner :refresh)]
            (go (loop []
-                 (let [contact (<! delete)]
-                   (js/alert "wow")
+                 (let [message (<! channel)]
+                   #_(js/alert message)
                    (recur))))))
        om/IDidMount
        ( did-mount [_]

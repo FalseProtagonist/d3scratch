@@ -18,11 +18,11 @@
   (reify
     om/IRenderState
     (render-state [_ val]
-      (let [delete (:refresh data)] 
+      (let [channel (:refresh data)] 
         (html [:button  
                {:on-click 
-                (fn [e] (do ((put! delete "hello")
-                             (js/alert "clickCLICK"))))
+                (fn [e] (put! channel "hello from your channel")
+                  )
                 }
                (:test data)]
               )))))
