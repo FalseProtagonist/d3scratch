@@ -5,9 +5,6 @@
             [cljs.core.async :refer [<! chan put! sliding-buffer sub pub timeout]]))
 
 
-(defonce app-state (atom {:text "Hello D3Scratch!!"}))
-
-
 (defn getrandomnodes [n width height]
   (clj->js (take n (repeatedly #(clj->js {
                                           :x (rand width) 
@@ -85,7 +82,7 @@
                (.nodes nodes)
                (.links links)
                (.linkDistance (/ width 5))
-               (.charge (fn [n] (get {0 100 1 -3000} (.-graph n))))
+               (.charge (fn [n] (get {0 10000 1 -3000} (.-graph n))))
                (.on "end"
                     #(do (clearcommand)))
                (.on "tick" updateall )
@@ -93,9 +90,14 @@
 
 (defn graph-component [data owner]
   (reify 
-    om/IRender
-    (render [_]
+    om/IInitState
+    (init-state [_]
+      {:graphstate "graphstate2"})      
+    om/IRenderState
+    (render-state [_ _]
       (html
-        [:div#map]))
+       [:div#map
+        [:p (om/get-state owner :graphstate)]
+        [:p data]]))
     om/IDidMount
     (did-mount [this] (force-layout))))

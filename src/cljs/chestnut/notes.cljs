@@ -9,9 +9,24 @@
 
 (defn button-component [data owner]
   (reify
-    om/IRender
-    (render [_]
-      (html [:button "component"]))))
+    om/IRenderState
+    (render-state [_ val]
+      (html [:button data]
+            ))))
+
+(defn button-component2 [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ val]
+      (let [delete (:refresh data)] 
+        (html [:button  
+               {:on-click 
+                (fn [e] (do ((put! delete "hello")
+                             (js/alert "clickCLICK"))))
+                }
+               (:test data)]
+              )))))
+
 
 (defn makeashape [] 
   (-> js/d3 
