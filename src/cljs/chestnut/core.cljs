@@ -7,9 +7,9 @@
    [cljs.core.async :refer 
     [<! chan put! sliding-buffer sub pub timeout]]
    [chestnut.graph :refer [graph-component]]
-   [chestnut.notes :refer [button-component button-component2]]))
+   [chestnut.notes :refer [button-component create-button]]))
 
-(defonce app-state (atom {:text "Hello world!"}))
+(defonce app-state (atom {:text "Application State"}))
 
 (defn main [] 
   (om/root
@@ -17,23 +17,34 @@
      (reify
        om/IInitState
        (init-state [_]
-         {:refresh (chan) :test "initstatebutton" :buttontext (:text app)})
+         {:refresh (chan) 
+          :clear (chan) 
+          :test "root initstate" 
+          :appstate (:text app)})
        om/IRenderState
        (render-state [this mystate]
          (html [:div [:div 
-                      [:button (:test mystate)]
-                      [:p "second"]
-                      [:p (om/build button-component (:test mystate) nil)]
-                      [:p "third"]
-                      [:p (om/build button-component2 mystate nil)]
-                      [:button (:text app)]
-                      [:button (om/get-state owner :buttontext)]
-                      [:button "rerun"] 
-                      [:p (om/build graph-component mystate nil)]
-                      [:p "world"]]]))
+                      [:p 
+                       "local init state: " 
+                       (:test mystate)]
+                      [:p 
+                       "button from local init state: "
+                       #_(om/build button-component mystate nil)
+                       (om/build 
+                        (create-button #(put! (:refresh mystate) "closure")) 
+                        mystate 
+                        nil)]
+                      [:p
+                       (om/build 
+                        (create-button #(put! (:clear mystate) "clear"))
+                        mystate
+                        nil)]
+                      [:p "passed in state: " (:text app)]
+                      [:p "owner state: " (om/get-state owner :appstate)]
+                      [:p (om/build graph-component mystate nil)]]]))
        om/IWillMount
        (will-mount [_]
-         (let [channel (om/get-state owner :refresh)]
+         #_(let [channel (om/get-state owner :refresh)]
            (go (loop []
                  (let [message (<! channel)]
                    #_(js/alert message)

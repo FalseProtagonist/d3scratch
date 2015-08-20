@@ -7,14 +7,20 @@
 (defn workingd3 []
   (-> js/d3 (.select "div") (.selectAll "p") (.data (clj->js ["hello" "world"])) .enter (.append "p") (.text "hello")))
 
-(defn button-component [data owner]
-  (reify
+(defn create-button [function]
+  (fn [data owner]
+    (reify
     om/IRenderState
     (render-state [_ val]
-      (html [:button data]
-            ))))
-
-(defn button-component2 [data owner]
+      (let [channel (:refresh data)] 
+        (html [:button  
+               {:on-click 
+                (fn [e] (put! channel "hello from your channel"))
+                }
+               (:test data)]
+              ))))
+    ))
+(defn button-component [data owner]
   (reify
     om/IRenderState
     (render-state [_ val]

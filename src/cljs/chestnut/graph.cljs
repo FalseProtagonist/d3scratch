@@ -1,11 +1,15 @@
 (ns chestnut.graph
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [sablono.core :as h :refer-macros [html]]
             [cljs.core.async :refer [<! chan put! sliding-buffer sub pub timeout]]))
 
-
+(def clear-command (fn [] (-> 
+                                  js/d3 
+                                  (.select "svg") 
+                                        ;(.selectAll "*") 
+                                  .remove)))
 (defn getrandomnodes [n width height]
   (clj->js (take n (repeatedly #(clj->js {
                                           :x (rand width) 
@@ -15,7 +19,7 @@
 (defn getrandomlinks [n]
   (clj->js (for [source (range n) 
                  target (range n)
-                 :when (= 0 (rand-int 13))]
+                 :when (= 0 (rand-int 20))]
              (clj->js {:source source :target target}))))
 
 
@@ -26,11 +30,6 @@
         animationstep 400
         counter (atom 10)
         colourmap {0 "green" 1 "red"}
-        clearcommand (fn [] (-> 
-                             js/d3 
-                             (.select "svg") 
-                             (.selectAll "*") 
-                             .remove))
         svg (-> js/d3 
                 (.select "div#map")
                 (.append "svg")
@@ -83,9 +82,11 @@
                (.nodes nodes)
                (.links links)
                (.linkDistance (/ width 5))
-               (.charge (fn [n] (get {0 10000 1 -3000} (.-graph n))))
+               (.charge (fn [n] (get {0 1000 1 -1000} (.-graph n))))
                (.on "end"
-                    #(do (clearcommand)))
+                    nil
+                    ;#(do (clear-command))
+                    )
                (.on "tick" updateall )
                .start)]))
 
@@ -93,21 +94,25 @@
   (reify 
     om/IInitState
     (init-state [_]
-      {:graphstate "graphstate2"})      
+      {:graphstate "graph initstate"})      
     om/IRenderState
     (render-state [_ _]
       (do (html
            [:div#map
-            [:p (om/get-state owner :graphstate)]
-            [:p data]]))
+            [:p "first: " (om/get-state owner :graphstate)]
+            [:p "second: " (:test data)]]))
       )
     om/IWillMount
     (will-mount [_]
-      (let [channel (:refresh data)]
-        (go (loop []
-              (let [message (<! channel)]
+      (let [refresh (:refresh data) clear (:clear data)]
+        (go-loop []
+          (let [message (<! refresh)] 
+            (do (clear-command)
                 (force-layout)
-                #_(js/alert message)
-                (recur))))))
+                (recur)
+                ; (js/alert message)
+                )))))
     om/IDidMount
     (did-mount [this] (force-layout))))
+
+
