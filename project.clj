@@ -33,6 +33,7 @@
                                         :source-map    "resources/public/js/out.js.map"
                                         :preamble      ["react/react.min.js"]
                                         :optimizations :none
+                                        :libs ["resources/libs/d3.v3.min.js"]
                                         :pretty-print  true}}}}
 
   :profiles {:dev {:source-paths ["env/dev/clj"]
@@ -63,7 +64,7 @@
                                                           :preamble      ["react/react.min.js"]
                                                           :optimizations :whitespace
                                                           :pretty-print  false
-                                                          :libs "resources/libs/d3.v3.min.js"}}}}}
+                                                          :libs ["resources/libs/d3.v3.min.js"]}}}}}
 
              :uberjar {:source-paths ["env/prod/clj"]
                        :hooks [leiningen.cljsbuild]
@@ -74,4 +75,5 @@
                                             {:source-paths ["env/prod/cljs"]
                                              :compiler
                                              {:optimizations :advanced
+                                              :libs ["resources/libs/d3.v3.min.js"]
                                               :pretty-print false}}}}}})
